@@ -10,8 +10,8 @@ A aplicação foi testada com as ferramentas e versões abaixo.
 
 ### Bibliotecas
 
-* [pigo](github.com/esimov/pigo)
-* [gg](github.com/fogleman/gg)
+* [pigo](https://github.com/esimov/pigo)
+* [gg](https://github.com/fogleman/gg)
 
 ## Instalação
 
