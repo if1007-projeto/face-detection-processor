@@ -21,6 +21,7 @@ Após instalar o go, instale as bibliotecas necessárias utilizando o comando ab
 go get -u github.com/esimov/pigo/cmd/pigo
 go get -u github.com/fogleman/gg
 go get -u github.com/disintegration/imaging
+go get -u github.com/lovoo/goka
 ```
 
 ## Como utilizar
