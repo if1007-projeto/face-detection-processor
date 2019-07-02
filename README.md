@@ -26,5 +26,5 @@ go get -u github.com/fogleman/gg
 
 ```bash
 go build
-./pigo-sample
+./face-detection-processor
 ```
