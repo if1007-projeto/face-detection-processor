@@ -1,12 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
+	"image/jpeg"
 	"log"
 	"os"
+	"strconv"
 
+	"github.com/disintegration/imaging"
 	pigo "github.com/esimov/pigo/core"
 )
 
@@ -17,6 +19,7 @@ var (
 	source      = flag.String("in", "", "Source image")
 	destination = flag.String("out", "", "Destination image")
 	cascadeFile = flag.String("cf", "", "Cascade binary file")
+	jpgQuality  = 100
 )
 
 func main() {
@@ -27,18 +30,18 @@ func main() {
 
 	classifier := CreateClassifierFromCascadeFile("./assets/facefinder")
 	faceDetector := NewFaceDetector(classifier, iouThreshold, angle)
-	faceMarker := NewFaceMarker()
+	// faceMarker := NewFaceMarker()
 
-	image, err := pigo.GetImage("image.jpg")
+	sourceImage, err := pigo.GetImage("./assets/image.jpg")
 	if err != nil {
 		log.Fatalf("Cannot open the image file: %v", err)
 	}
 
-	dets := faceDetector.GetAllFacesPositions(image)
+	dets := faceDetector.GetAllFacesPositions(sourceImage)
 
-	buff := new(bytes.Buffer)
+	// image := faceMarker.drawMarker(sourceImage, dets)
 
-	faceMarker.drawMarkerJPG(buff, image, dets, 200)
+	faces := CropAllFaces(sourceImage, dets)
 
 	file, err := os.Create("out.jpg")
 	if err != nil {
@@ -46,6 +49,12 @@ func main() {
 	}
 	defer file.Close()
 
-	file.Write(buff.Bytes())
+	var opt jpeg.Options
+	opt.Quality = jpgQuality
 
+	for i := 0; i < len(faces); i++ {
+		imaging.Save(faces[i], strconv.Itoa(i)+".jpg")
+	}
+
+	// jpeg.Encode(file, faces[0], &opt)
 }

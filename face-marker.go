@@ -3,8 +3,6 @@ package main
 import (
 	"image"
 	"image/color"
-	"image/jpeg"
-	"io"
 
 	pigo "github.com/esimov/pigo/core"
 	"github.com/fogleman/gg"
@@ -22,7 +20,7 @@ func NewFaceMarker() FaceMarker {
 
 // drawMarker mark the detected face region with the provided
 // marker (rectangle or circle) and write it to io.Writer.
-func (fm FaceMarker) drawMarkerJPG(w io.Writer, image *image.NRGBA, detections []pigo.Detection, quality int) error {
+func (fm FaceMarker) drawMarker(image *image.NRGBA, detections []pigo.Detection) image.Image {
 	cols, rows := GetImageColsAndRows(image)
 
 	dc := gg.NewContext(cols, rows)
@@ -43,8 +41,5 @@ func (fm FaceMarker) drawMarkerJPG(w io.Writer, image *image.NRGBA, detections [
 		}
 	}
 
-	var opt jpeg.Options
-	opt.Quality = quality
-
-	return jpeg.Encode(w, dc.Image(), &opt)
+	return dc.Image()
 }
