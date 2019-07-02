@@ -1,4 +1,4 @@
-# Face Detection Service
+# Face Detection Processor
 
 Serviço responsável por ler os frames do kafka, detectar todas as faces presentes no frame e publicar novamente no kafka.
 
