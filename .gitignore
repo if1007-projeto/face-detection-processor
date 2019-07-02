@@ -1,2 +1,9 @@
 # binary executable file
 face-detection-processor
+
+# output image
+*.png
+*.jpg
+
+# don't ignore assets files
+!assets/*.jpg
