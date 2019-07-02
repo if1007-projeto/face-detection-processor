@@ -26,6 +26,14 @@ go get -u github.com/lovoo/goka
 
 ## Como utilizar
 
+Primeiro, suba os containers do kafka utilizando o comando abaixo.
+
+```bash
+docker-compose up
+```
+
+Depois disso, compile a aplicação e execute.
+
 ```bash
 go build
 ./face-detection-processor
