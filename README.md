@@ -42,7 +42,7 @@ $ docker-compose --version
 docker-compose version 1.24.0, build 0aa59064
 ```
 
-**Importante**: Caso sua versão seja abaixo da 1.18, é necessário que você atualize-o antes de prosseguir.
+**Importante**: Caso sua versão seja abaixo da 1.18, é necessário que você atualize o docker-compose antes de prosseguir.
 
 Agora podemos "levantar" os containers do kafka usando o comando abaixo.
 
