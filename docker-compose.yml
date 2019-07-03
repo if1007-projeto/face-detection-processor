@@ -41,6 +41,8 @@ services:
 
   detection_service:
     container_name: detection_service
+    depends_on:
+      - kafka
     build: ./
     # environment:
     #   ZOOKEEPER_CLIENT_PORT: 2181
