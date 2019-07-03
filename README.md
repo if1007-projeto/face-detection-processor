@@ -1,4 +1,4 @@
-# Face Detection Processor
+# Face Detection Service
 
 Serviço responsável por ler os frames do kafka, detectar todas as faces presentes no frame e publicar novamente no kafka.
 
@@ -14,6 +14,8 @@ A aplicação foi testada com as ferramentas e versões abaixo.
 
 * [pigo](https://github.com/esimov/pigo)
 * [gg](https://github.com/fogleman/gg)
+* [imaging](https://github.com/disintegration/imaging)
+* [goka](http://github.com/lovoo/goka)
 
 ## Instalação
 
@@ -54,5 +56,5 @@ Depois disso, compile a aplicação e execute-a.
 
 ```bash
 go build
-./face-detection-processor
+./face-detection-service
 ```
