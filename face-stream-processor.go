@@ -16,26 +16,21 @@ import (
 )
 
 type FaceStreamProcessor struct {
-	faceDetector  FaceDetector
-	brokers       []string
-	producerTopic goka.Stream
-	jpgQuality    int
-	emitter       *goka.Emitter
+	faceDetector FaceDetector
+	brokers      []string
+	facesEmitter *goka.Emitter
+	marksEmitter *goka.Emitter
+	jpgQuality   int
 }
 
-func NewFaceStreamProcessor(faceDetector FaceDetector, brokers []string, producerTopic goka.Stream, jpgQuality int) FaceStreamProcessor {
-	emitter, err := goka.NewEmitter(brokers, producerTopic, new(codec.Bytes))
-	if err != nil {
-		log.Fatalf("error creating emitter: %v", err)
-	}
-
-	faceProcessor := FaceStreamProcessor{faceDetector, brokers, producerTopic, jpgQuality, emitter}
+func NewFaceStreamProcessor(faceDetector FaceDetector, brokers []string, facesEmitter *goka.Emitter, marksEmitter *goka.Emitter, jpgQuality int) FaceStreamProcessor {
+	faceProcessor := FaceStreamProcessor{faceDetector, brokers, facesEmitter, marksEmitter, jpgQuality}
 
 	return faceProcessor
 }
 
 // emits a single message and leave
-func (fp FaceStreamProcessor) publishFace(face image.Image) error {
+func (fp FaceStreamProcessor) publishFace(emitter *goka.Emitter, face image.Image) error {
 	var opt jpeg.Options
 	opt.Quality = fp.jpgQuality
 	faceBuffer := new(bytes.Buffer)
@@ -46,7 +41,7 @@ func (fp FaceStreamProcessor) publishFace(face image.Image) error {
 		return err
 	}
 
-	err = fp.emitter.EmitSync("", faceBuffer.Bytes())
+	err = emitter.EmitSync("", faceBuffer.Bytes())
 	if err != nil {
 		log.Printf("[ERROR] publishing image: %v", err)
 		return err
@@ -58,13 +53,14 @@ func (fp FaceStreamProcessor) publishFace(face image.Image) error {
 func (fp FaceStreamProcessor) publishAllFaces(faces []image.Image) {
 	for i := 0; i < len(faces); i++ {
 		face := faces[i]
-		fp.publishFace(face)
+		fp.publishFace(fp.facesEmitter, face)
 	}
 }
 
 // process callback is invoked for each message delivered from
 // consumer topic
 func (fp FaceStreamProcessor) processFrame(ctx goka.Context, msg interface{}) {
+	log.Printf("[INFO] processing frames")
 	imageBytes := msg.([]byte)
 
 	image, err := jpeg.Decode(bytes.NewReader(imageBytes))
@@ -83,16 +79,23 @@ func (fp FaceStreamProcessor) processFrame(ctx goka.Context, msg interface{}) {
 	}
 
 	fp.publishAllFaces(faces)
+
+	markedImage := DrawMarker(sourceImage, dets)
+
+	fp.publishFace(fp.marksEmitter, markedImage)
 }
 
 // process messages until ctrl-c is pressed
 func (fp FaceStreamProcessor) RunProcessor(consumerTopic goka.Stream, consumerGroup goka.Group) {
 	// Define a new processor group. The group defines all inputs, outputs, and
 	// serialization formats. The group-table topic is "example-group-table".
+	log.Printf("[INFO] defining consumer group %s", consumerGroup)
 	g := goka.DefineGroup(consumerGroup,
 		goka.Input(consumerTopic, new(codec.Bytes), fp.processFrame),
 		goka.Persist(new(codec.Int64)),
 	)
+
+	log.Printf("[INFO] consumer group %s defined", consumerGroup)
 
 	p, err := goka.NewProcessor(fp.brokers, g)
 	if err != nil {

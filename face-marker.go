@@ -18,9 +18,9 @@ func NewFaceMarker() FaceMarker {
 	return fm
 }
 
-// drawMarker mark the detected face region with the provided
+// DrawMark mark the detected face region with the provided
 // marker (rectangle or circle) and write it to io.Writer.
-func (fm FaceMarker) drawMarker(image *image.NRGBA, detections []pigo.Detection) image.Image {
+func DrawMarker(image *image.NRGBA, detections []pigo.Detection) image.Image {
 	cols, rows := GetImageColsAndRows(image)
 
 	dc := gg.NewContext(cols, rows)
